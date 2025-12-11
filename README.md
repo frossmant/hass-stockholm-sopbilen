@@ -19,8 +19,7 @@ Here is an example for the address format that should be used when adding a moni
 Daltorpsvägen 28, Vällingby, 16244
 ```
 See [example.yaml](example.yaml) for an example deck to display your waste management.
-![Garbage Collection Screenshot](https://raw.githubusercontent.com/frossmant/hass-stockholm-sopbilen/screenshot_deck.png)
-
+![Garbage Collection Screenshot](https://raw.githubusercontent.com/frossmant/hass-stockholm-sopbilen/main/screenshot_deck.png)
 
 ## Features
 - Adding addresses to monitor using the standard home assistant integration UI
