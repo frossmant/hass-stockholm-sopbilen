@@ -3,12 +3,24 @@
 ## Description
 Home Assistant Integration for Stockholm Waste Management for home owners.
 
+## Installation
+1. Go to **HACS → Integrations**
+2. Click the **⋮ menu → Custom repositories**
+3. Add:
+4. Category: **Integration**
+5. Install → Restart Home Assistant
+6. Go to **Settings → Devices & Services → Add Integration**
+7. Search for **Stockholm Sopbilen**
+8. Restart Home Assistant
+
 ## Usage
 Here is an example for the address format that should be used when adding a monitored address in the HASS GUI.
 ```
 Daltorpsvägen 28, Vällingby, 16244
 ```
 See [example.yaml](example.yaml) for an example deck to display your waste management.
+![Garbage Collection Screenshot](https://raw.githubusercontent.com/frossmant/hass-stockholm-sopbilen/screenshot_deck.png)
+
 
 ## Features
 - Adding addresses to monitor using the standard home assistant integration UI
