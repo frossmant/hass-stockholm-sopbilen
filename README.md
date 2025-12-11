@@ -15,10 +15,10 @@ https://www.stockholmvattenochavfall.se/villa-och-radhus/avfallstjanster/nar-kom
       Type: Integration
 ```
 5. Click ADD
-6. Install → Restart Home Assistant
-7. Go to **Settings → Devices & Services → Add Integration**
-8. Search for **Stockholm Sopbilen**
-9. Restart Home Assistant
+6. Install
+7. Restart Home Assistant
+8. Go to **Settings → Devices & Services → Add Integration**
+9. Search for **Stockholm Sopbilen**
 
 ## Usage
 Here is an example for the address format that should be used when adding a monitored address in the HASS GUI.
