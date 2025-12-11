@@ -6,8 +6,9 @@ Home Assistant Integration for Stockholm Waste Management for home owners.
 ## Installation
 1. Go to **HACS → Integrations**
 2. Click the **⋮ menu → Custom repositories**
-3. Add:
-4. Category: **Integration**
+   Repository: https://github.com/frossmant/hass-stockholm-sopbilen
+         Type: Integration
+   Click on ADD
 5. Install → Restart Home Assistant
 6. Go to **Settings → Devices & Services → Add Integration**
 7. Search for **Stockholm Sopbilen**
