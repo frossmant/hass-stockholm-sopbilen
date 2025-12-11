@@ -14,9 +14,9 @@ https://www.stockholmvattenochavfall.se/villa-och-radhus/avfallstjanster/nar-kom
       Repository: https://github.com/frossmant/hass-stockholm-sopbilen
       Type: Integration
 ```
-5. Click ADD
-6. Install
-7. Restart Home Assistant
+5. Click **add**
+6. **Install**
+7. **Restart** Home Assistant
 8. Go to **Settings → Devices & Services → Add Integration**
 9. Search for **Stockholm Sopbilen**
 
