@@ -1,0 +1,7 @@
+{
+  "name": "Stockholm Sopbilen",
+  "domain": "stockholm_sopbilen",
+  "country": "SE",
+  "homeassistant": "2024.0.0",
+  "render_readme": true
+}

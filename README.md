@@ -1,2 +1,18 @@
-# hass-stockholm-sopbilen
-# hass-stockholm-sopbilen
+# hass-stockholm-sopbilen 
+
+## Description
+Home Assistant Integration for Stockholm Waste Management for home owners.
+
+## Features
+- Adding addresses to monitor using the standard home assistant integration UI
+- Currently monitoring two types of waste, Restavfall and Matavfall
+- Getting execution date, weekday and frequency in weeks for the waste collection.
+
+## Contact
+frossmant@icloud.com
+
+## Changelog
+See [CHANGELOG](CHANGELOG)
+
+## License
+GPL v3 license, see [LICENSE](LICENSE).

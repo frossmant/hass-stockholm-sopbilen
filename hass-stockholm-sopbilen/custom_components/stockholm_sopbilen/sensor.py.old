@@ -1,0 +1,233 @@
+import logging
+import re
+import sys
+import json
+from datetime import datetime
+
+BASE_URL = (
+    "https://www.stockholmvattenochavfall.se/"
+    "villa-och-radhus/avfallstjanster/nar-kommer-sopbilen/Search"
+)
+
+_LOGGER = logging.getLogger(__name__)
+
+RUNNING_TEST = __name__ == "__main__"
+
+# -------------------------------------------------------------------
+# HOME ASSISTANT MODE (normal integration)
+# -------------------------------------------------------------------
+if not RUNNING_TEST:
+    import voluptuous as vol
+
+    from homeassistant.components.sensor import (
+        PLATFORM_SCHEMA,
+        SensorEntity,
+    )
+    from homeassistant.const import (
+        CONF_NAME,
+        CONF_SCAN_INTERVAL,
+    )
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.aiohttp_client import async_get_clientsession
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    import homeassistant.helpers.config_validation as cv
+
+    CONF_ADDRESS = "address"
+
+    DEFAULT_NAME = "Stockholm Sopbilen"
+
+    PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+        {
+            vol.Required(CONF_ADDRESS): cv.string,
+            vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+            vol.Optional(CONF_SCAN_INTERVAL, default=3600): cv.positive_int,
+        }
+    )
+
+    async def async_setup_platform(
+        hass: HomeAssistant,
+        config,
+        async_add_entities: AddEntitiesCallback,
+        discovery_info=None,
+    ):
+        """Set up the Stockholm Sopbilen sensor."""
+        address = config[CONF_ADDRESS]
+        name = config[CONF_NAME]
+        scan_interval = config.get(CONF_SCAN_INTERVAL, 3600)
+
+        _LOGGER.info(
+            "Setting up Stockholm Sopbilen sensor '%s' for address '%s' (scan_interval=%s)",
+            name,
+            address,
+            scan_interval,
+        )
+
+        session = async_get_clientsession(hass)
+        sensor = StockholmSopbilenSensor(name, address, session, scan_interval)
+
+        async_add_entities([sensor], update_before_add=True)
+
+    class StockholmSopbilenSensor(SensorEntity):
+        """Representation of a Stockholm Sopbilen sensor."""
+
+        _attr_icon = "mdi:trash-can"
+
+        def __init__(self, name, address, session, scan_interval):
+            """Initialize the sensor."""
+            self._attr_name = name
+            self._address = address
+            self._session = session
+            self._scan_interval = scan_interval
+            self._attr_native_value = None
+            self._attr_extra_state_attributes = {
+                "address": address,
+                "raw_json": None,
+                "last_update_success": False,
+                "fractions": {},
+            }
+
+        @property
+        def unique_id(self):
+            """Return a unique ID for this sensor."""
+            slug = self._address.lower().replace(" ", "_").replace(",", "")
+            return f"stockholm_sopbilen_{slug}"
+
+        async def async_update(self):
+            """Fetch latest data from Stockholm Vatten & Avfall."""
+            params = {"address": self._address}
+            _LOGGER.debug("Requesting sopbilen data for address=%s", self._address)
+
+            try:
+                async with self._session.get(BASE_URL, params=params) as resp:
+                    _LOGGER.debug(
+                        "Sopbilen HTTP response: %s %s", resp.status, resp.reason
+                    )
+                    text = await resp.text()
+                    if resp.status != 200:
+                        _LOGGER.warning(
+                            "Non-200 response from sopbilen API: %s", resp.status
+                        )
+                        self._attr_extra_state_attributes["last_update_success"] = False
+                        return
+            except Exception as err:
+                _LOGGER.warning("Error fetching sopbilen data: %s", err)
+                self._attr_extra_state_attributes["last_update_success"] = False
+                return
+
+            # Try to parse JSON
+            try:
+                data = json.loads(text)
+            except json.JSONDecodeError as err:
+                _LOGGER.error("Failed to decode sopbilen JSON: %s", err)
+                self._attr_extra_state_attributes["last_update_success"] = False
+                self._attr_extra_state_attributes["raw_json"] = text
+                return
+
+            self._attr_extra_state_attributes["raw_json"] = data
+            self._attr_extra_state_attributes["last_update_success"] = True
+
+            # Parse fractions and find earliest ExecutionDate
+            fractions_attr = {}
+            earliest_date = None
+
+            for fraction_name, entries in data.items():
+                if not entries:
+                    continue
+                entry = entries[0]  # first object in list
+                exec_date_str = entry.get("ExecutionDate")
+                freq = entry.get("FetchFrequency")
+                weekday = entry.get("Weekday")
+
+                # Save per-fraction info in attributes
+                fractions_attr[fraction_name] = {
+                    "execution_date": exec_date_str,
+                    "weekday": weekday,
+                    "frequency": freq,
+                }
+
+                # Track earliest date for sensor state
+                if exec_date_str:
+                    try:
+                        exec_dt = datetime.fromisoformat(exec_date_str)
+                    except ValueError:
+                        _LOGGER.debug(
+                            "Invalid ExecutionDate format '%s' for fraction '%s'",
+                            exec_date_str,
+                            fraction_name,
+                        )
+                    else:
+                        if earliest_date is None or exec_dt < earliest_date:
+                            earliest_date = exec_dt
+
+            self._attr_extra_state_attributes["fractions"] = fractions_attr
+
+            if earliest_date:
+                # state = date string like 2025-12-05
+                self._attr_native_value = earliest_date.date().isoformat()
+            else:
+                _LOGGER.debug(
+                    "No valid ExecutionDate found in sopbilen data for address %s",
+                    self._address,
+                )
+
+# -------------------------------------------------------------------
+# TEST MODE — run from command line with required address
+# -------------------------------------------------------------------
+if RUNNING_TEST:
+    import urllib.parse
+    import urllib.request
+
+    if len(sys.argv) < 2:
+        print('ERROR: Usage: python3 sensor.py "<address>"')
+        print('Example: python3 sensor.py "Torpslingan 12, Vällingby, 16244"')
+        sys.exit(1)
+
+    ADDRESS = sys.argv[1]
+
+    def parse_date_from_json(text: str):
+        """Parse JSON like the live response and return earliest ExecutionDate."""
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as err:
+            print("JSON decode error:", err)
+            return None
+
+        earliest = None
+        for fraction_name, entries in data.items():
+            if not entries:
+                continue
+            exec_date_str = entries[0].get("ExecutionDate")
+            if not exec_date_str:
+                continue
+            try:
+                dt = datetime.fromisoformat(exec_date_str)
+            except ValueError:
+                print(f"Invalid date '{exec_date_str}' for fraction '{fraction_name}'")
+                continue
+            if earliest is None or dt < earliest:
+                earliest = dt
+
+        return earliest.date().isoformat() if earliest else None
+
+    def main():
+        params = urllib.parse.urlencode({"address": ADDRESS})
+        url = f"{BASE_URL}?{params}"
+
+        print(f"Fetching for: {ADDRESS}")
+        print(f"URL: {url}")
+
+        with urllib.request.urlopen(url) as resp:
+            status = resp.status
+            text = resp.read().decode("utf-8", errors="replace")
+
+        print(f"HTTP status: {status}")
+        print("\n=== RAW (first 500 chars) ===")
+        print(text[:500])
+        print("\n=== END RAW ===\n")
+
+        parsed = parse_date_from_json(text)
+        print("=== PARSED EARLIEST DATE ===")
+        print(parsed if parsed else "No date found")
+
+    if __name__ == "__main__":
+        main()

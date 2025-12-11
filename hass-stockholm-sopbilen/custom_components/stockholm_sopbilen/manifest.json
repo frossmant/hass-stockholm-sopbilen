@@ -1,0 +1,12 @@
+{
+  "domain": "stockholm_sopbilen",
+  "name": "Stockholm Sopbilen",
+  "version": "1.0.0",
+  "documentation": "https://github.com/frossmant/hass-stockholm-sopbilen", 
+  "requirements": [],
+  "codeowners": ["@frossmant"],
+  "iot_class": "cloud_polling",
+  "config_flow": true,
+  "loggers": ["custom_components.stockholm_sopbilen"],
+  "integration_type": "service"
+}
