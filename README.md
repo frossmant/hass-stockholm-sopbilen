@@ -8,6 +8,7 @@ Here is an example for the address format that should be used when adding a moni
 ```
 Daltorpsvägen 28, Vällingby, 16244
 ```
+See [example.yaml](example.yaml) for an example deck to display your waste management.
 
 ## Features
 - Adding addresses to monitor using the standard home assistant integration UI
