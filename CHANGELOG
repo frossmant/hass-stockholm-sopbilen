@@ -1,0 +1,7 @@
+== 1.0.0 First Version 
+    New features:
+    ------------
+    + Configuration of sensors in the hass gui
+    + Monitoring of Restavfall and Matavfall types of waste management.
+    + Sensor data will show xecution date, weekday and frequency in weeks for the waste collection. 
+
