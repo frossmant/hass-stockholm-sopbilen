@@ -4,7 +4,7 @@
 Home Assistant Integration for Stockholm Waste Management for home owners.
 
 ## Usage
-The format when adding monitored addresses in the integration gui should be
+Here is an example for the address format that should be used when adding a monitored address in the HASS GUI.
 ```
 Daltorpsvägen 28, Vällingby, 16244
 ```
