@@ -10,11 +10,11 @@ Home Assistant Integration for Stockholm Waste Management for home owners.
       Repository: https://github.com/frossmant/hass-stockholm-sopbilen
       Type: Integration
 ```
-      Click on ADD
-5. Install → Restart Home Assistant
-6. Go to **Settings → Devices & Services → Add Integration**
-7. Search for **Stockholm Sopbilen**
-8. Restart Home Assistant
+5. Click ADD
+6. Install → Restart Home Assistant
+7. Go to **Settings → Devices & Services → Add Integration**
+8. Search for **Stockholm Sopbilen**
+9. Restart Home Assistant
 
 ## Usage
 Here is an example for the address format that should be used when adding a monitored address in the HASS GUI.
