@@ -4,6 +4,7 @@
 Home Assistant Integration for Stockholm Waste Management for home owners.
 
 Using Stockholm Vatten och Avfall's default search function to get data.
+
 https://www.stockholmvattenochavfall.se/villa-och-radhus/avfallstjanster/nar-kommer-sopbilen/
 
 ## Installation
