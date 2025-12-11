@@ -3,6 +3,9 @@
 ## Description
 Home Assistant Integration for Stockholm Waste Management for home owners.
 
+## Usage
+The format when adding monitored addresses in the integration gui should be "Daltorpsvägen 28, Vällingby, 16244".
+
 ## Features
 - Adding addresses to monitor using the standard home assistant integration UI
 - Currently monitoring two types of waste, Restavfall and Matavfall
