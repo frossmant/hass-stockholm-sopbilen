@@ -1,7 +1,6 @@
 {
   "domain": "stockholm_sopbilen",
   "name": "Stockholm Sopbilen",
-  "icon": "custom_components/stockholm_sopbilen/icon.png",
   "version": "1.0.0",
   "documentation": "https://github.com/frossmant/hass-stockholm-sopbilen", 
   "requirements": [],
